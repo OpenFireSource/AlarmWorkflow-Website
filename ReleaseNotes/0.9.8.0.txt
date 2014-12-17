@@ -1,0 +1,11 @@
+﻿AlarmWorkflow-Website v0.9.8.0 Release Notes
+============================================
+
+Änderungen seit v0.9.7.0
+------------------------
+
+Generelles
+
+  * [Website] Ausgelagert in eigenes Projekt.
+  * [Website] Es können neue Alarmseiten erstellt werden. Diese können unter C:\inetpub\wwwroot\Areas\Display\Views\Alarm erstellt werden. Der Dateiname (ohne cshtml) dient zur Identifizierung. http://localhost/Display/Alarm/Index/**NAME** kann als Aufruf verwendet werden.
+  
