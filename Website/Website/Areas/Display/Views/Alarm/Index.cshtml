@@ -28,8 +28,64 @@
     var zoomOnAddress = true;
     var useTilt = @(config.Tilt.ToString().ToLower());
     var useTraffic = @(config.Traffic.ToString().ToLower());
-    var zoomLevel = 0.8;//In Prozent
+    var zoomLevel = @((config.GoogleZoomLevel/100.0).ToString().Replace(',','.'));//In Prozent
     var home = "@(config.Home)";
+    var googleMarker = null;
+    var osmMarker = null;
+    var firstTime = true;
+
+    function scale(outer, inner) {
+        if (inner.length) {
+            inner.css('font-size', '1px');
+
+            if (inner.text().length == 0) {
+                return;
+            }
+
+            var width = outer.width();
+            var height = outer.height();
+            if (inner.height() == 0 || inner.width() == 0) {
+                return;
+            }
+            while (inner.height() < height && inner.width() <= width) {
+                inner.css('font-size',(parseInt(inner.css('font-size')) +4)+ "px");
+            }
+            while (inner.width() > width || inner.height() > height) {
+                inner.css('font-size',(parseInt(inner.css('font-size')) - 1)+ "px");
+            }
+        }
+    }
+    function goToLatLng(dest){
+        map.panTo(dest);
+        map.setZoom(18);
+        maxZoomService.getMaxZoomAtLatLng(dest, function (response) {
+            if (response.status == google.maps.MaxZoomStatus.OK) {
+                var zoom = Math.round(response.zoom * zoomLevel);
+                map.setZoom(zoom);
+            }
+        });
+    }
+    function addGoogleMarker(location) {
+        if(googleMarker == null)
+        {
+            googleMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+            });
+        } else {
+            googleMarker.setPosition(location);
+        }
+    }
+    function addOsmMarker(location) {
+        if (osmMarker == null) {
+            osmMarker = L.marker(location);
+            osmMarker.addTo(osm);
+        } else {
+            osmMarker.setLatLng(location);
+        }
+
+
+    }
 
     function calcRoute(start, end) {
         var request = {
@@ -42,6 +98,16 @@
                 directionsDisplay.setDirections(result);
                 var l = result.routes[0].overview_path.length;
                 addressCoor = result.routes[0].overview_path[l - 1];
+                google.maps.event.addListener(map, 'tilesloaded', function () {
+                    if (zoomOnAddress && firstTime) {
+                        firstTime = false;
+                        goToLatLng(end);
+                    }
+                });  
+            } else {
+                console.log("Routing not possible! Only centering to location!");
+                addGoogleMarker(end);
+                goToLatLng(end);
             }
         });
     }
@@ -57,7 +123,17 @@
 
         });
     }
+    $( window ).resize(function() {
+        if (currentOpId != -1) {
+            $('span.alarm').each(function() {
+                $(this).css('font-size', '1px');
+            });
+            $('span.alarm').each(function() {
+                scale($(this).parent(), $(this));
+            });
+        }
 
+    });
     function loadOperationData() {
         console.log("Loading Operation");
         $.get('/Display/Alarm/GetLatestOperation', function(result) {
@@ -74,7 +150,9 @@
                     $("#paneIdle").hide();
                     if (currentOpId != result.op.Id) {
                         currentOpId = result.op.Id;
-
+                        $('span.alarm').each(function(){
+                            $(this).css('font-size', '1px');
+                        });
                         console.log("Got new Operation");
                         $("#opicture").text(result.op.Picture);
                         $("#ocomment").text(result.op.Comment);
@@ -96,7 +174,7 @@
                         $("#oaddress").text(oaddress);
 
                         // Prepare Keywords for display.
-                        var okeywords = "Stichwörter: ";
+                        var okeywords = "Stichw&ouml;rter: ";
                         if (result.op.Keywords.Keyword != null) {
                             okeywords += result.op.Keywords.Keyword + " ";
                         }
@@ -117,7 +195,7 @@
                         }
 
                         okeywords = okeywords.replace("  ", " ");
-                        $("#okeywords").text(okeywords);
+                        $("#okeywords").html(okeywords);
                         var orsc = "";
                         // Resources
                         $.get("/Display/Alarm/GetFilteredResources/" + currentOpId, function(data) {
@@ -139,71 +217,33 @@
 
 
                         $("#paneOperation").show();
+                        setTimeout(function(){
+                            $('span.alarm').each(function(){
+                                scale($(this).parent(),$(this));
+                            });
+                        },5);
                         //GoogleMaps Stuff
                         google.maps.visualRefresh = true;
                         directionsDisplay = new google.maps.DirectionsRenderer();
-                        var firstTime = true;
-                        var address = oaddress;
-                        var dest = new google.maps.LatLng(result.op.Einsatzort.GeoLatitude,result.op.Einsatzort.GeoLongitude);
+                        firstTime = true;
+                        var dest = new google.maps.LatLng(result.op.Einsatzort.GeoLatitude.replace(',','.'),result.op.Einsatzort.GeoLongitude.replace(',','.'));
 
-                        map = new google.maps.Map(document.getElementById("ogoogle"), mapOptions);
 
-                        var mapOptions = {
-                            zoom: 10,
-                            overviewMapControl: false,
-                            panControl: false,
-                            mapTypeControl: true,
-                            streetViewControl: false,
-                            zoomControl: @(config.ZoomControl.ToString().ToLower()),
-                            mapTypeId: @(config.MapTypeGoogle)
-                            };
-                        //45°
-                        if (useTilt) {
-                            map.setTilt(45);
-                        }
-                        //TRAFFIC
-                        if (useTraffic) {
-                            var trafficLayer = new google.maps.TrafficLayer();
-                            trafficLayer.setMap(map);
-                        }
                         if (!showRoute) {
-                            new google.maps.Marker({
-                                position: dest,
-                                map: map,
-                            });
-                            map.setCenter(dest);
-                            map.setZoom(18);
-                            maxZoomService.getMaxZoomAtLatLng(dest, function (response) {
-                                if (response.status == google.maps.MaxZoomStatus.OK) {
-                                    var zoom = Math.round(response.zoom * zoomLevel);
-                                    map.setZoom(zoom);
-                                }
-                            });
+                            addGoogleMarker(dest);
+                            goToLatLng(dest);
                         } else {
                             //ROUTE
                             directionsDisplay.setMap(map);
-                            calcRoute(home, address);
-                            google.maps.event.addListener(map, 'tilesloaded', function () {
-                                if (zoomOnAddress && firstTime) {
-                                    firstTime = false;
-                                    map.setCenter(dest);
-                                    map.setZoom(18);
-                                    maxZoomService.getMaxZoomAtLatLng(dest, function (response) {
-                                        if (response.status == google.maps.MaxZoomStatus.OK) {
-                                            var zoom = Math.round(response.zoom * zoomLevel);
-                                            map.setZoom(zoom);
-                                        }
-                                    });
-                                }
-                            });
+                            calcRoute(home, dest);
                         }
 
-                        osm.setView([result.op.Einsatzort.GeoLatitude,result.op.Einsatzort.GeoLongitude], 16);
-                        L.marker([result.op.Einsatzort.GeoLatitude, result.op.Einsatzort.GeoLongitude]).addTo(osm);
+                        osm.setView([result.op.Einsatzort.GeoLatitude.replace(',','.'),result.op.Einsatzort.GeoLongitude.replace(',','.')], @(config.OSMZoomLevel));
+                        addOsmMarker([result.op.Einsatzort.GeoLatitude.replace(',', '.'), result.op.Einsatzort.GeoLongitude.replace(',', '.')]);
                     }
                 }
             } else {
-                // Reset current operation and display warning.
+                // Reset current operation and display the idle screen.
                 currentOpId = -1;
                 $("#paneOperation").hide();
                 $("#paneIdle").hide();
@@ -229,39 +269,53 @@
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(osm);
         L.tileLayer('http://www.openfiremap.org/hytiles/{z}/{x}/{y}.png').addTo(osm);
+        var mapOptions = {
+            zoom: 10,
+            overviewMapControl: false,
+            panControl: false,
+            mapTypeControl: true,
+            streetViewControl: false,
+            zoomControl: @(config.ZoomControl.ToString().ToLower()),
+            mapTypeId: @(config.MapTypeGoogle)
+            };
+        map = new google.maps.Map(document.getElementById("ogoogle"), mapOptions);
+        //45°
+        if (useTilt) {
+            map.setTilt(45);
+        }
+        //TRAFFIC
+        if (useTraffic) {
+            var trafficLayer = new google.maps.TrafficLayer();
+            trafficLayer.setMap(map);
+        }
     });
 
 </script>
-
 <!-- Page contents -->
 <!-- Pane initially shown -->
 <div id="paneLoading">
     <span>Lade, bitte warten...</span>
-    <script type="text/javascript">
-        loadOperationData();
-    </script>
 </div>
-
 <!-- Pane to be displayed in case of an error-->
 <div id="paneError">
     <span>Ein Fehler ist aufgetreten.<br /> Bitte sehen Sie in den Serverlogs nach.</span>
 </div>
-<!-- Pane to be displayed in case of an error-->
+<!-- Pane to be displayed in case of no operation and no error-->
 <div id="paneIdle">
     <span>Es liegt kein Einsatz vor.</span>
 </div>
 <!-- Pane to be displayed otherwise -->
 <div id="paneOperation">
     <table>
-        <tr>
-            <td class="alarm" id="opicture"></td>
-            <td class="alarm" id="okeywords"></td>
+        <tr style="height: 17%;">
+            <td class="alarm"><span class="alarm" id="opicture"></span></td>
+            <td class="alarm"><span class="alarm" id="okeywords"></span></td>
         </tr>
-        <tr>
-            <td class="alarm" id="oaddress"></td>
-            <td class="alarm" id="ocomment"></td>
+        <tr style="height: 25%;">
+            <td class="alarm"><span class="alarm" id="oaddress"></span></td>
+            <td class="alarm"><span class="alarm" id="ocomment"></span></td>
         </tr>
-        <tr>
+        <tr style="height: 40%;">
             <td class="alarm opcolumn">
                 <div class="opcell" id="ogoogle"></div>
             </td>
@@ -269,7 +323,7 @@
                 <div class="opcell" id="oosm"></div>
             </td>
         </tr>
-        <tr>
+        <tr style="height: 18%;">
             <td class="alarm" colspan="2" id="orsc"></td>
         </tr>
     </table>

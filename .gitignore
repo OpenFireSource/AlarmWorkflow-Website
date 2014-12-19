@@ -18,3 +18,5 @@ TestResults
 *.InstallState
 
 /Build
+/Website/Website/Backend.Services.config
+/Website/Website/Backend.config

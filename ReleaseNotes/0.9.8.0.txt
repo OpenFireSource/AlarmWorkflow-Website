@@ -8,4 +8,6 @@ Generelles
 
   * [Website] Ausgelagert in eigenes Projekt.
   * [Website] Es können neue Alarmseiten erstellt werden. Diese können unter C:\inetpub\wwwroot\Areas\Display\Views\Alarm erstellt werden. Der Dateiname (ohne cshtml) dient zur Identifizierung. http://localhost/Display/Alarm/Index/**NAME** kann als Aufruf verwendet werden.
+  * [Website] Automatische Skalierung der Schriftart zur optimalen Ausnutzung der verfügbaren Fläche (und zur Verhinderung, dass die Karte verschwindet)
+  * [Website] Einige Änderungen im Sourcecode (Umlaute, Karte,...)
   
