@@ -261,6 +261,8 @@
     <Content Include="Images\helpicon.png" />
     <None Include="Properties\PublishProfiles\Default.pubxml" />
     <None Include="Scripts\jquery-2.1.3-vsdoc.js" />
+    <Content Include="Areas\Display\Scripts\index.js" />
+    <Content Include="Scripts\app\utils.js" />
     <Content Include="Scripts\jquery-2.1.3.js" />
     <Content Include="Scripts\jquery-2.1.3.min.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.js" />
