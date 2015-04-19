@@ -33,7 +33,7 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
 {
     public class AlarmController : Controller
     {
-        private Guid _guid = Guid.NewGuid();
+        #region Methods
 
         /// <summary>
         /// GET: /Display/Alarm/Index
@@ -47,6 +47,7 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
             {
                 return View();
             }
+
             return View(id);
         }
 
@@ -57,34 +58,27 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
         public ActionResult GetLatestOperation()
         {
             GetLastOperationData data = new GetLastOperationData();
+
             try
             {
                 using (var service = ServiceFactory.GetCallbackServiceWrapper<IOperationService>(new OperationServiceCallback()))
                 {
                     IList<int> ids = service.Instance.GetOperationIds(WebsiteConfiguration.Instance.MaxAge, WebsiteConfiguration.Instance.NonAcknowledgedOnly, 1);
-                    if (ids.Count == 1)
+                    if (ids.Any())
                     {
-                        Operation item = service.Instance.GetOperationById(ids[0]);
-                        data.success = true;
+                        Operation item = service.Instance.GetOperationById(ids.Single());
                         data.op = item;
                     }
-                    else if (ids.Count == 0)
-                    {
-                        data.success = true;
-                        data.op = null;
-                    }
+
+                    data.success = true;
                 }
             }
             catch (Exception ex)
             {
-                // It's ok when an exception is thrown here. We catch it, log it, and the View considers it as an error (success is false).
                 Logger.Instance.LogException(this, ex);
             }
 
-            JsonResult result = new JsonResult();
-            result.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-            result.Data = data;
-            return result;
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -93,7 +87,8 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
         /// <returns></returns>
         public ActionResult ResetOperation(int id)
         {
-            ResetOperationData returnValue = new ResetOperationData();
+            ResetOperationData result = new ResetOperationData();
+
             try
             {
                 using (var service = ServiceFactory.GetCallbackServiceWrapper<IOperationService>(new OperationServiceCallback()))
@@ -101,31 +96,28 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
                     Operation item = service.Instance.GetOperationById(id);
                     if (item == null)
                     {
-                        returnValue.success = false;
-                        returnValue.message = "Operation not found!";
+                        result.success = false;
+                        result.message = "Operation not found!";
                     }
                     else if (item.IsAcknowledged)
                     {
-                        returnValue.success = false;
-                        returnValue.message = "Operation is already acknowledged!";
+                        result.success = false;
+                        result.message = "Operation is already acknowledged!";
                     }
                     else
                     {
                         service.Instance.AcknowledgeOperation(id);
-                        returnValue.success = true;
-                        returnValue.message = "Operation successfully acknowledged!";
+                        result.success = true;
+                        result.message = "Operation successfully acknowledged!";
                     }
                 }
             }
             catch (Exception ex)
             {
-                // It's ok when an exception is thrown here. We catch it, log it, and the View considers it as an error (success is false).
                 Logger.Instance.LogException(this, ex);
             }
-            JsonResult jsonResult = new JsonResult();
-            jsonResult.Data = returnValue;
-            jsonResult.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-            return jsonResult;
+
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -134,20 +126,18 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
         /// <returns></returns>
         public ActionResult ResetLatestOperation()
         {
-            JsonResult result = GetLatestOperation() as JsonResult;
-            if (result != null)
+            JsonResult latestOperation = GetLatestOperation() as JsonResult;
+            if (latestOperation != null)
             {
-                GetLastOperationData data = result.Data as GetLastOperationData;
+                GetLastOperationData data = latestOperation.Data as GetLastOperationData;
                 if (data != null && (data.success && data.op != null))
                 {
                     return ResetOperation(data.op.Id);
                 }
-
             }
-            JsonResult jsonResult = new JsonResult();
-            jsonResult.Data = new ResetOperationData { message = "An undefined error occured.", success = false };
-            jsonResult.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-            return jsonResult;
+
+            var result = new ResetOperationData { message = "An undefined error occured.", success = false };
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -182,17 +172,16 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
                 List<ResourceObject> filteredResources = new List<ResourceObject>();
 
                 IList<OperationResource> filtered = emkService.Instance.GetFilteredResources(operation.Resources);
+
                 foreach (OperationResource resource in filtered)
                 {
                     EmkResource emk = emkResources.FirstOrDefault(item => item.IsActive && item.IsMatch(resource));
                     filteredResources.Add(new ResourceObject(emk, resource));
                 }
+
                 data.Resources = filteredResources;
 
-                JsonResult result = new JsonResult();
-                result.Data = data;
-                result.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-                return result;
+                return Json(data, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -206,40 +195,51 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
         [OutputCache(Duration = 120, VaryByParam = "id", Location = OutputCacheLocation.ServerAndClient)]
         public ActionResult GetResourceImage(string id)
         {
+            EmkResource resource = null;
+
             using (var emkService = ServiceFactory.GetServiceWrapper<IEmkService>())
             {
                 IList<EmkResource> emkResources = emkService.Instance.GetAllResources();
-                EmkResource resource = emkResources.FirstOrDefault(x => x.Id == id);
-                if (resource == null)
-                {
-                    return null;
-                }
-                using (FileTransferServiceClient client = new FileTransferServiceClient())
-                {
-                    try
-                    {
-                        Stream content = client.GetFileFromPath(resource.IconFileName);
+                resource = emkResources.FirstOrDefault(x => x.Id == id);
+            }
 
-                        if (content != null)
-                        {
-                            return File(content, GetMimeType(resource.IconFileName));
-                        }
-                    }
-                    catch (IOException ex)
+            if (resource == null)
+            {
+                return null;
+            }
+
+            using (FileTransferServiceClient client = new FileTransferServiceClient())
+            {
+                try
+                {
+                    Stream content = client.GetFileFromPath(resource.IconFileName);
+
+                    if (content != null)
                     {
-                        // This exception is totally OK. No image will be displayed.
+                        return File(content, GetMimeType(resource.IconFileName));
                     }
-                    catch (AssertionFailedException)
-                    {
-                        // This exception is totally OK. No image will be displayed.
-                    }
+                }
+                catch (IOException)
+                {
+                    // This exception is totally OK. No image will be displayed.
+                }
+                catch (AssertionFailedException)
+                {
+                    // This exception is totally OK. No image will be displayed.
                 }
             }
+
             return null;
         }
 
         private static string GetMimeType(string path)
         {
+            /* TODO: This call is not really required. Also not sure if this would prevent running the app eventually on Mono, since on Unix there's no registry?
+             * Whatever the case, it should be reviewed whether or not this is really required, and if not, be removed.
+             * 
+             * See http://www.mono-project.com/docs/getting-started/application-portability/#registry-usage and then accordingly either remove this comment, or this method.
+             */
+
             const string unkownMimeType = "application/unknown";
             RegistryKey regKey = Registry.ClassesRoot.OpenSubKey(Path.GetExtension(path).ToLower());
 
@@ -253,5 +253,6 @@ namespace AlarmWorkflow.Website.Reports.Areas.Display.Controllers
             return (contentType == null) ? unkownMimeType : contentType.ToString();
         }
 
+        #endregion
     }
 }
