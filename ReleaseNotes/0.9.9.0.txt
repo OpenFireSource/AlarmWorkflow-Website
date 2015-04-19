@@ -1,0 +1,10 @@
+﻿AlarmWorkflow-Website v0.9.9.0 Release Notes
+============================================
+
+Änderungen seit v0.9.8.0
+------------------------
+
+Generelles
+
+  * Wichtig: Ab einschließlich dieser Version unterstützt AlarmWorkflow nur Windows 7 SP1 und höher (.Net Framework 4.5.1)!
+  
