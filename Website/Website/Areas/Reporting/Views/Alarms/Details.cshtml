@@ -4,180 +4,212 @@
     ViewBag.Title = "Details";
 }
 
-<h2>Allgemeine Daten</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Allgemeine Daten</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+            <tr>
+                <td style="width: 170px;"><b>Zeitpunkt:</b></td>
+                <td>
+                    <table>
+                        <tr>
+                            <td><b>Eingang:</b></td>
+                            <td>@Model.TimestampIncome <img src="~/Images/helpicon.png" title="Zeitpunkt des Eingangs des Alarms." alt="" /> </td>
+                        </tr>
+                        <tr>
+                            <td><b>Empfang:</b></td>
+                            <td>@Model.Timestamp <img src="~/Images/helpicon.png" title="Zeitstempel der Alarmquelle (Fax, SMS etc.)." alt="" /></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td><b>Einsatzort:</b></td>
+                <td><a href="@string.Format("https://www.google.de/maps?q={0}", Model.Einsatzort.ToString())">@Model.Einsatzort.ToString()</a></td>
+            </tr>
+            @if (Model.Zielort.IsMeaningful)
+            {
+                <tr>
+                    <td><b>Zielort:</b></td>
+                    <td><a href="@string.Format("https://www.google.de/maps?q={0}", Model.Zielort.ToString())">@Model.Zielort.ToString()</a></td>
+                </tr>
+            }
+            <tr>
+                <td><b>Bemerkung:</b></td>
+                <td>@Model.Comment</td>
+            </tr>
+            <tr>
+                <td><b>Mitteiler:</b></td>
+                <td>@Model.Messenger</td>
+            </tr>
+            @if (!Model.OperationPlan.IsEmpty())
+            {
+                <tr>
+                    <td><b>Einsatzplan:</b></td>
+                    <td>@Model.OperationPlan</td>
+                </tr>
+            }
+            @if (!Model.Picture.IsEmpty())
+            {
+                <tr>
+                    <td><b>Meldebild:</b></td>
+                    <td>@Model.Picture</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
 
-<table>
-  <tr>
-    <td><b>Zeitpunkt:</b></td>
-    <td>
-      <table>
-        <tr>
-          <td><b>Eingang:</b></td>
-          <td>@Model.TimestampIncome <img src="~/Images/helpicon.png" title="Zeitpunkt des Eingangs des Alarms." alt="" /> </td>
-        </tr>
-        <tr>
-          <td><b>Empfang:</b></td>
-          <td>@Model.Timestamp <img src="~/Images/helpicon.png" title="Zeitstempel der Alarmquelle (Fax, SMS etc.)." alt="" /></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td><b>Einsatzort:</b></td>
-    <td><a href="@string.Format("https://www.google.de/maps?q={0}", Model.Einsatzort.ToString())">@Model.Einsatzort.ToString()</a></td>
-  </tr>
-  @if (Model.Zielort.IsMeaningful)
-  {
-  <tr>
-    <td><b>Zielort:</b></td>
-    <td><a href="@string.Format("https://www.google.de/maps?q={0}", Model.Zielort.ToString())">@Model.Zielort.ToString()</a></td>
-  </tr>
-  }
-  <tr>
-    <td><b>Bemerkung:</b></td>
-    <td>@Model.Comment</td>
-  </tr>
-  <tr>
-    <td><b>Mitteiler:</b></td>
-    <td>@Model.Messenger</td>
-  </tr>
-  @if (!Model.OperationPlan.IsEmpty())
-  {
-  <tr>
-    <td><b>Einsatzplan:</b></td>
-    <td>@Model.OperationPlan</td>
-  </tr>
-  }
-  @if (!Model.Picture.IsEmpty())
-  {
-  <tr>
-    <td><b>Meldebild:</b></td>
-    <td>@Model.Picture</td>
-  </tr>
-  }
-</table>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Stichwörter</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+            @if (!Model.Keywords.Keyword.IsEmpty())
+            {
+                <tr>
+                    <td style="width: 170px;"><b>Stichwort (generisch):</b></td>
+                    <td>@Model.Keywords.Keyword</td>
+                </tr>
+            }
+            @if (!Model.Keywords.EmergencyKeyword.IsEmpty())
+            {
+                <tr>
+                    <td style="width: 170px;"><b>Stichwort:</b></td>
+                    <td>@Model.Keywords.EmergencyKeyword</td>
+                </tr>
+            }
+            @if (!Model.Keywords.B.IsEmpty())
+            {
+                <tr>
+                    <td><b>Stichwort B:</b></td>
+                    <td>@Model.Keywords.B</td>
+                </tr>
+            }
+            @if (!Model.Keywords.R.IsEmpty())
+            {
+                <tr>
+                    <td><b>Stichwort R:</b></td>
+                    <td>@Model.Keywords.R</td>
+                </tr>
+            }
+            @if (!Model.Keywords.S.IsEmpty())
+            {
+                <tr>
+                    <td><b>Stichwort S:</b></td>
+                    <td>@Model.Keywords.S</td>
+                </tr>
+            }
+            @if (!Model.Keywords.T.IsEmpty())
+            {
+                <tr>
+                    <td><b>Stichwort T:</b></td>
+                    <td>@Model.Keywords.T</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
 
-<h2>Stichwörter</h2>
-
-<table>
-  @if (!Model.Keywords.Keyword.IsEmpty())
-  {
-  <tr>
-    <td><b>Stichwort (generisch):</b></td>
-    <td>@Model.Keywords.Keyword</td>
-  </tr>
-  }
-  @if (!Model.Keywords.EmergencyKeyword.IsEmpty())
-  {
-  <tr>
-    <td><b>Stichwort:</b></td>
-    <td>@Model.Keywords.EmergencyKeyword</td>
-  </tr>
-  }
-  @if (!Model.Keywords.B.IsEmpty())
-  {
-  <tr>
-    <td><b>Stichwort B:</b></td>
-    <td>@Model.Keywords.B</td>
-  </tr>
-  }
-  @if (!Model.Keywords.R.IsEmpty())
-  {
-  <tr>
-    <td><b>Stichwort R:</b></td>
-    <td>@Model.Keywords.R</td>
-  </tr>
-  }
-  @if (!Model.Keywords.S.IsEmpty())
-  {
-  <tr>
-    <td><b>Stichwort S:</b></td>
-    <td>@Model.Keywords.S</td>
-  </tr>
-  }
-  @if (!Model.Keywords.T.IsEmpty())
-  {
-  <tr>
-    <td><b>Stichwort T:</b></td>
-    <td>@Model.Keywords.T</td>
-  </tr>
-  }
-</table>
-
-<h2>Schleifen</h2>
-
-<!-- Render loops, if any are present. -->
-@if (Model.Loops.Any())
-{
-<table>
-  <tr>
-    <th><b>Schleifencode</b></th>
-  </tr>
-
-  @foreach (var item in Model.Loops)
-  {
-  <tr>
-    <td>@item</td>
-  </tr>
-  }
-</table>
-}
-else
-{
-<p>Zu diesem Alarm sind keine Schleifencodes verfügbar.</p>
-}
-
-<h2>Einsatzmittel</h2>
-
-<!-- Render resources, if any are present. -->
-@if (Model.Resources.Any())
-{
-<table>
-  <tr>
-    <th><b>Name</b></th>
-    <th><b>Geforderte Ausstattung</b></th>
-    <th><b>Zeitpunkt</b></th>
-  </tr>
-
-  @foreach (var item in Model.Resources)
-  {
-  <tr>
-    <td>@item.FullName</td>
-    <td>@string.Join(", ", item.RequestedEquipment)</td>
-    <td>
-        @if (item.Timestamp == DateTime.MinValue.ToString())
-        { <span>Unbekannt</span> }
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Schleifen</h3>
+    </div>
+    <div class="panel-body">
+        <!-- Render loops, if any are present. -->
+        @if (Model.Loops.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Schleifencode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Loops)
+                {
+                        <tr>
+                            <td>@item</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
         else
-        { @item.Timestamp }
-    </td>
-  </tr>
-  }
-</table>
-}
-else
-{
-<p>Zu diesem Alarm sind keine Einsatzmittelinformationen verfügbar.</p>
-}
+        {
+            <p>Zu diesem Alarm sind keine Schleifencodes verfügbar.</p>
+        }
+    </div>
+</div>
 
-<h2>Spezifische Daten</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Einsatzmittel</h3>
+    </div>
+    <div class="panel-body">
+        <!-- Render resources, if any are present. -->
+        @if (Model.Resources.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><b>Name</b></th>
+                        <th><b>Geforderte Ausstattung</b></th>
+                        <th><b>Zeitpunkt</b></th>
+                    </tr>
+                </thead>
+                <tbody>
 
-<!-- Render custom data, if any are present. -->
-@if (Model.CustomData.Any())
-{
-<table>
-  @foreach (var item in Model.CustomData)
-  {
-  <tr>
-     <td><b>@item.Key:</b></td>
-     <td>@item.Value</td>
-  </tr>
-  }
-</table>
-}
-else
-{
-<p>Zu diesem Alarm sind keine spezifischen Daten verfügbar.</p>
-}
+                    @foreach (var item in Model.Resources)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@string.Join(", ", item.RequestedEquipment)</td>
+                            <td>
+                                @if (item.Timestamp == DateTime.MinValue.ToString())
+                    { <span>Unbekannt</span> }
+                    else
+                    { @item.Timestamp }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Zu diesem Alarm sind keine Einsatzmittelinformationen verfügbar.</p>
+        }
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Spezifische Daten</h3>
+    </div>
+    <div class="panel-body">
+        <!-- Render custom data, if any are present. -->
+        @if (Model.CustomData.Any())
+        {
+            <table class="table">
+                @foreach (var item in Model.CustomData)
+                {
+                    <tr>
+                        <td style="width: 170px;"><b>@item.Key:</b></td>
+                        <td>@item.Value</td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <p>Zu diesem Alarm sind keine spezifischen Daten verfügbar.</p>
+        }
+    </div>
+</div>
 
 <p>
     @Html.ActionLink("Zurück", "Index")

@@ -2,23 +2,13 @@
     ViewBag.Title = "Home Page";
 }
 @section featured {
-    <section class="featured">
-        <div class="content-wrapper">
-            <hgroup class="title">
-                <h1>Willkommen</h1>
-            </hgroup>
-            <p>
-                
-            </p>
-        </div>
-    </section>
+    <div class="jumbotron">
+        <h1>Willkommen</h1>
+        <p class="lead">Dies ist die Internetpräsenz von AlarmWorkflow. Hier können Sie sich den Alarmmonitor aufrufen oder die vergangenen Alarme anzeigen lassen.</p>
+        
+        <p>
+            @Html.ActionLink("Zur Alarmanzeige wechseln", "Index", "Display/Alarm", new { }, new { @class = "btn btn-lg btn-success" })
+            @Html.ActionLink("Alarme ansehen", "Index", "Reporting/Alarms", new { }, new { @class = "btn btn-lg btn-success" })
+        </p>
+    </div>
 }
-<h3>Was möchten Sie tun?</h3>
-<ul class="round">
-    <li>
-        <h5>@Html.ActionLink("Zur Alarmanzeige wechseln...", "Index", "Display/Alarm")</h5>        
-    </li>
-    <li>
-        <h5>@Html.ActionLink("Alarme ansehen...", "Index", "Reporting/Alarms")</h5>        
-    </li>
-</ul>
