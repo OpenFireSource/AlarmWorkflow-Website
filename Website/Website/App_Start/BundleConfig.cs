@@ -62,6 +62,9 @@ namespace AlarmWorkflow.Website.Reports
             bundles.Add(new StyleBundle("~/content/bootstrap")
                 .Include("~/Content/bootstrap.css")
                 .Include("~/Content/bootstrap-responsive.css")
+                .Include("~/Content/bootstrap-theme.css"));
+
+            bundles.Add(new StyleBundle("~/content/mainDesign")
                 .Include("~/Content/siteMain.css"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap")
