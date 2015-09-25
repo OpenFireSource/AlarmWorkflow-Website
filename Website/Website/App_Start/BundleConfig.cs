@@ -55,6 +55,22 @@ namespace AlarmWorkflow.Website.Reports
 
             bundles.Add(new ScriptBundle("~/bundles/app/common").Include(
                         "~/Scripts/app/utils.js"));
+
+            /**
+             * Bootstrap files
+             */
+            bundles.Add(new StyleBundle("~/content/bootstrap")
+                .Include("~/Content/bootstrap.css")
+                .Include("~/Content/bootstrap-responsive.css")
+                .Include("~/Content/bootstrap-theme.css"));
+
+            bundles.Add(new StyleBundle("~/content/mainDesign")
+                .Include("~/Content/siteMain.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap")
+                .Include("~/Scripts/jquery-{version}.js")
+                .Include("~/Scripts/jquery-ui-{version}.js")
+                .Include("~/Scripts/bootstrap.js"));
         }
     }
 }

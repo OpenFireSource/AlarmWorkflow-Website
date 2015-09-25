@@ -10,26 +10,39 @@
 <p>
     Auf dieser Seite können Sie alle bisherigen Alarme ansehen.
 </p>
-<table>
-    <tr>
-        <th>Zeitpunkt</th>
-        <th>Bemerkung</th>
-        <th></th>
-    </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-           <b>@item.TimestampIncome</b>
-        </td>
-        <td>
-           <b title="@item.Comment">@item.Comment.Truncate(64)</b>
-        </td>
-        <td>
-            @Html.ActionLink("Details", "Details", new { item.Id })
-        </td>
-    </tr>
-}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Zeitpunkt</th>
+            <th>Stichwort</th>
+            <th>Schlagw.</th>
+            <th>Bemerkung</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.TimestampIncome
+                </td>
+                <td>
+                    @item.Keywords.EmergencyKeyword.Truncate(9)
+                </td>
+                <td>
+                    @item.Keywords.Keyword.Truncate(22)
+                </td>
+                <td>
+                    @item.Comment.Truncate(42)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
 
 <p><b>Anzahl Alarme: </b>@Model.Count()</p>
