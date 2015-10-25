@@ -193,7 +193,8 @@ function loadOperationData() {
                     }, 5);
                     //GoogleMaps Stuff
                     google.maps.visualRefresh = true;
-                    directionsDisplay = new google.maps.DirectionsRenderer();
+                    directionsDisplay.setDirections({ routes: [] });
+                    google.maps.event.clearListeners(map, 'tilesloaded');
                     firstTime = true;
                     var dest = new google.maps.LatLng(result.op.Einsatzort.GeoLatitude.replace(',', '.'), result.op.Einsatzort.GeoLongitude.replace(',', '.'));
 
