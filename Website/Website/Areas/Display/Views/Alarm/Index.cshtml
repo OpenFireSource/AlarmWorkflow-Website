@@ -15,25 +15,25 @@
     <span>Lade, bitte warten...</span>
 </div>
 <!-- Pane to be displayed in case of an error-->
-<div id="paneError">
+<div id="paneError" ng-if="!result.success">
     <span>Ein Fehler ist aufgetreten.<br /> Bitte sehen Sie in den Serverlogs nach.</span>
 </div>
 <!-- Pane to be displayed in case of no operation and no error-->
-<div id="paneIdle">
+<div id="paneIdle" ng-if="result.op == null && result.success">
     <span>Es liegt kein Einsatz vor.</span>
 </div>
 <!-- Pane to be displayed otherwise -->
-<div id="paneOperation">
+<div id="paneOperation" ng-hide="result.op == null">
     <table>
         <tr style="height: 17%;">
-            <td class="alarm"><span class="alarm" id="opicture"></span></td>
-            <td class="alarm"><span class="alarm" id="okeywords"></span></td>
+            <td class="alarm opcolumn"><span class="alarm">{{op.Picture}} </span></td>
+            <td class="alarm opcolumn"><span class="alarm">{{op.Keywords.Keyword}} {{op.Keywords.EmergencyKeyword}} {{op.Keywords.B}} {{op.Keywords.R}} {{op.Keywords.S}} {{op.Keywords.T}}</span></td>
         </tr>
         <tr style="height: 25%;">
-            <td class="alarm"><span class="alarm" id="oaddress"></span></td>
-            <td class="alarm"><span class="alarm" id="ocomment"></span></td>
+            <td class="alarm opcolumn"><span class="alarm">{{op.Einsatzort.Street}} {{op.Einsatzort.StreetNumber}} {{op.Einsatzort.ZipCode}} {{op.Einsatzort.City}}</span></td>
+            <td class="alarm opcolumn"><span class="alarm">{{op.Comment}}</span></td>
         </tr>
-        <tr style="height: 40%;">
+        <tr style="height: 40%;" ng-hide="!op.Einsatzort.HasGeoCoordinates">
             <td class="alarm opcolumn">
                 <div class="opcell" id="ogoogle"></div>
             </td>
@@ -46,8 +46,11 @@
         </tr>
     </table>
     <div>
-        <a href="javascript:void(0);" onclick="reset(); return false;">Einsatz erledigt!</a>
+        <a href ng-click="reset()">Einsatz erledigt!</a>
     </div>
+</div>
+<div>
+    
 </div>
 
 @section scripts {

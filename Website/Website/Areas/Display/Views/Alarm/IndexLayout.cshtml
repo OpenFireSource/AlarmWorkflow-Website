@@ -10,11 +10,12 @@
 
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/angular")
     @Scripts.Render("~/bundles/app/common")
     @RenderSection("scripts", required: false)
 </head>
-<body>
-    <div>
+<body ng-app="alarmApp">
+    <div ng-controller="alarmCtrl">
         @RenderBody()
     </div>
 </body>
