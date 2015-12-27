@@ -8,7 +8,7 @@
 <!-- Stylesheets -->
 <link rel="stylesheet" href="@Styles.Url("~/Content/app/area-alarm-index.css")" />
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 <!-- Page contents -->
 <!-- Pane initially shown -->
 <div id="paneLoading">
@@ -24,27 +24,22 @@
 </div>
 <!-- Pane to be displayed otherwise -->
 <div id="paneOperation" ng-hide="result.op == null">
-    <table>
-        <tr style="height: 17%;">
-            <td class="alarm opcolumn"><span class="alarm">{{op.Picture}} </span></td>
-            <td class="alarm opcolumn"><span class="alarm">{{op.Keywords.Keyword}} {{op.Keywords.EmergencyKeyword}} {{op.Keywords.B}} {{op.Keywords.R}} {{op.Keywords.S}} {{op.Keywords.T}}</span></td>
-        </tr>
-        <tr style="height: 25%;">
-            <td class="alarm opcolumn"><span class="alarm">{{op.Einsatzort.Street}} {{op.Einsatzort.StreetNumber}} {{op.Einsatzort.ZipCode}} {{op.Einsatzort.City}}</span></td>
-            <td class="alarm opcolumn"><span class="alarm">{{op.Comment}}</span></td>
-        </tr>
-        <tr style="height: 40%;" ng-hide="!op.Einsatzort.HasGeoCoordinates">
-            <td class="alarm opcolumn">
-                <div class="opcell" id="ogoogle"></div>
-            </td>
-            <td class="alarm opcolumn">
-                <div class="opcell" id="oosm"></div>
-            </td>
-        </tr>
-        <tr style="height: 18%;">
-            <td class="alarm" colspan="2" id="orsc"></td>
-        </tr>
-    </table>
+    <div class="row" style="height: 18%;">
+        <div class="col-md-6 alarm"><span class="alarm">{{op.Picture}}</span></div>
+        <div class="col-md-6 alarm"><span class="alarm">{{op.Keywords.Keyword}} {{op.Keywords.EmergencyKeyword}} {{op.Keywords.B}} {{op.Keywords.R}} {{op.Keywords.S}} {{op.Keywords.T}}</span></div>
+    </div>
+    <div class="row" style="height: 25%;">
+        <div class="col-md-6 alarm"><span class="alarm">{{op.Einsatzort.Street}} {{op.Einsatzort.StreetNumber}} {{op.Einsatzort.ZipCode}} {{op.Einsatzort.City}}</span></div>
+        <div class="col-md-6 alarm"><span class="alarm">{{op.Comment}}</span></div>
+    </div>
+    <div class="row" style="height: 39%;" ng-init="true" ng-hide="!op.Einsatzort.HasGeoCoordinates">
+        <div class="col-md-6 alarm-map"><div class="opcell" id="ogoogle"></div></div>
+        <div class="col-md-6 alarm-map"><div class="opcell" id="oosm"></div></div>
+    </div>
+    <div class="row" style="height: 18%;">
+        <div class="col-md-12 alarm" id="orsc"></div>
+    </div>
+      
     <div>
         <a href ng-click="reset()">Einsatz erledigt!</a>
     </div>

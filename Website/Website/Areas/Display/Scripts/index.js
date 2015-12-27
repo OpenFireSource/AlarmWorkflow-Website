@@ -21,8 +21,7 @@ var googleMarker = null;
 var osmMarker = null;
 var firstTime = true;
 var app = angular.module('alarmApp', []);
-app.controller('alarmCtrl',function($scope)
-{
+app.controller('alarmCtrl', function ($scope) {
 
     function goToLatLng(dest) {
         map.panTo(dest);
@@ -52,8 +51,6 @@ app.controller('alarmCtrl',function($scope)
         } else {
             osmMarker.setLatLng(location);
         }
-
-
     }
 
     function calcRoute(start, end) {
@@ -65,8 +62,6 @@ app.controller('alarmCtrl',function($scope)
         directionsService.route(request, function (result, status) {
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(result);
-                var l = result.routes[0].overview_path.length;
-                addressCoor = result.routes[0].overview_path[l - 1];
                 google.maps.event.addListener(map, 'tilesloaded', function () {
                     if (zoomOnAddress && firstTime) {
                         firstTime = false;
@@ -83,13 +78,11 @@ app.controller('alarmCtrl',function($scope)
 
     $scope.reset = function () {
         $.get("/Display/Alarm/ResetLatestOperation", function (result) {
-
             if (result.success) {
                 loadOperationData();
             } else {
                 console.log(result.message);
             }
-
         });
     }
 
@@ -110,7 +103,7 @@ app.controller('alarmCtrl',function($scope)
         $.get('/Display/Alarm/GetLatestOperation', function (result) {
 
             $("#paneLoading").hide();
-            $scope.$apply(function() {
+            $scope.$apply(function () {
                 $scope.result = result;
             });
             if (result.success == true) {
@@ -123,6 +116,7 @@ app.controller('alarmCtrl',function($scope)
                             $(this).css('font-size', '1px');
                         });
                         console.log("Got new Operation");
+                       
                         var orsc = "";
                         // Resources
                         $.get("/Display/Alarm/GetFilteredResources/" + currentOpId, function (data) {
@@ -151,11 +145,11 @@ app.controller('alarmCtrl',function($scope)
                         }, 5);
                         //GoogleMaps Stuff
                         google.maps.visualRefresh = true;
+                        google.maps.event.trigger(map, 'resize');
                         directionsDisplay.setDirections({ routes: [] });
                         google.maps.event.clearListeners(map, 'tilesloaded');
                         firstTime = true;
                         var dest = new google.maps.LatLng(result.op.Einsatzort.GeoLatitude.replace(',', '.'), result.op.Einsatzort.GeoLongitude.replace(',', '.'));
-
 
                         if (!showRoute) {
                             addGoogleMarker(dest);
@@ -184,33 +178,31 @@ app.controller('alarmCtrl',function($scope)
     window.setInterval(loadOperationData, config.updateIntervalMs);
 
     $(loadOperationData);
+    osm = L.map('oosm');
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(osm);
+    L.tileLayer('http://www.openfiremap.org/hytiles/{z}/{x}/{y}.png').addTo(osm);
+    var mapOptions = {
+        zoom: 10,
+        overviewMapControl: false,
+        panControl: false,
+        mapTypeControl: true,
+        streetViewControl: false,
+        zoomControl: config.zoomControl,
+        mapTypeId: config.mapTypeGoogle
+    };
+    map = new google.maps.Map(document.getElementById("ogoogle"), mapOptions);
 
-    $(function () {
-        osm = L.map('oosm');
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(osm);
-        L.tileLayer('http://www.openfiremap.org/hytiles/{z}/{x}/{y}.png').addTo(osm);
-        var mapOptions = {
-            zoom: 10,
-            overviewMapControl: false,
-            panControl: false,
-            mapTypeControl: true,
-            streetViewControl: false,
-            zoomControl: config.zoomControl,
-            mapTypeId: config.mapTypeGoogle
-        };
-        map = new google.maps.Map(document.getElementById("ogoogle"), mapOptions);
+    //45°
+    if (useTilt) {
+        map.setTilt(45);
+    }
 
-        //45°
-        if (useTilt) {
-            map.setTilt(45);
-        }
+    //TRAFFIC
+    if (useTraffic) {
+        var trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+    }
 
-        //TRAFFIC
-        if (useTraffic) {
-            var trafficLayer = new google.maps.TrafficLayer();
-            trafficLayer.setMap(map);
-        }
-    });
 });
