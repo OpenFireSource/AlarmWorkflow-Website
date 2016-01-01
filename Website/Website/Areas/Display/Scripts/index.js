@@ -149,7 +149,7 @@ app.controller('alarmCtrl', function ($scope) {
                         directionsDisplay.setDirections({ routes: [] });
                         google.maps.event.clearListeners(map, 'tilesloaded');
                         firstTime = true;
-                        var dest = new google.maps.LatLng(result.op.Einsatzort.GeoLatitude.replace(',', '.'), result.op.Einsatzort.GeoLongitude.replace(',', '.'));
+                        var dest = new google.maps.LatLng(result.op.Einsatzort.GeoLatitudeString, result.op.Einsatzort.GeoLongitudeString);
 
                         if (!showRoute) {
                             addGoogleMarker(dest);
@@ -160,8 +160,8 @@ app.controller('alarmCtrl', function ($scope) {
                             calcRoute(home, dest);
                         }
 
-                        osm.setView([result.op.Einsatzort.GeoLatitude.replace(',', '.'), result.op.Einsatzort.GeoLongitude.replace(',', '.')], config.zoomLevelOSM);
-                        addOsmMarker([result.op.Einsatzort.GeoLatitude.replace(',', '.'), result.op.Einsatzort.GeoLongitude.replace(',', '.')]);
+                        osm.setView([result.op.Einsatzort.GeoLatitudeString, result.op.Einsatzort.GeoLongitudeString], config.zoomLevelOSM);
+                        addOsmMarker([result.op.Einsatzort.GeoLatitudeString, result.op.Einsatzort.GeoLongitudeString]);
                     }
                 }
             } else {
