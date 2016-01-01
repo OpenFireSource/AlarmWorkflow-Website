@@ -24,34 +24,34 @@
 </div>
 <!-- Pane to be displayed otherwise -->
 <div id="paneOperation" ng-hide="result.op == null">
-    <div class="row" style="height: 18%;">
-        <div class="col-md-6 alarm"><span class="alarm">{{op.Picture}}</span></div>
-        <div class="col-md-6 alarm"><span class="alarm">{{op.Keywords.Keyword}} {{op.Keywords.EmergencyKeyword}} {{op.Keywords.B}} {{op.Keywords.R}} {{op.Keywords.S}} {{op.Keywords.T}}</span></div>
+    <div class="row" ng-style="{'height' : op.Einsatzort.HasGeoCoordinates ? '18%' : '33%' }">
+        <div class=" col-xs-6 alarm"><span class="alarm">{{op.Picture}}</span></div>
+        <div class="col-xs-6 alarm"><span class="alarm">{{op.Keywords.Keyword}} {{op.Keywords.EmergencyKeyword}} {{op.Keywords.B}} {{op.Keywords.R}} {{op.Keywords.S}} {{op.Keywords.T}}</span></div>
     </div>
-    <div class="row" style="height: 25%;">
-        <div class="col-md-6 alarm"><span class="alarm">{{op.Einsatzort.Street}} {{op.Einsatzort.StreetNumber}} {{op.Einsatzort.ZipCode}} {{op.Einsatzort.City}}</span></div>
-        <div class="col-md-6 alarm"><span class="alarm">{{op.Comment}}</span></div>
+    <div class="row" ng-style="{'height' : op.Einsatzort.HasGeoCoordinates ? '25%' : '36%' }">
+        <div class="col-xs-6 alarm"><span class="alarm">{{op.Einsatzort.Street}} {{op.Einsatzort.StreetNumber}} {{op.Einsatzort.ZipCode}} {{op.Einsatzort.City}}</span></div>
+        <div class="col-xs-6 alarm"><span class="alarm">{{op.Comment}}</span></div>
     </div>
     <div class="row" style="height: 39%;" ng-init="true" ng-hide="!op.Einsatzort.HasGeoCoordinates">
-        <div class="col-md-6 alarm-map"><div class="opcell" id="ogoogle"></div></div>
-        <div class="col-md-6 alarm-map"><div class="opcell" id="oosm"></div></div>
+        <div class="col-xs-6 alarm-map"><div class="opcell" id="ogoogle"></div></div>
+        <div class="col-xs-6 alarm-map"><div class="opcell" id="oosm"></div></div>
     </div>
-    <div class="row" style="height: 18%;">
-        <div class="col-md-12 alarm" id="orsc"></div>
+    <div class="row" ng-style="{'height' : op.Einsatzort.HasGeoCoordinates ? '18%' : '33%' }">
+        <div class=" col-xs-12 alarm" id="orsc"></div>
     </div>
-      
+
     <div>
         <a href ng-click="reset()">Einsatz erledigt!</a>
     </div>
 </div>
 <div>
-    
+
 </div>
 
 @section scripts {
 
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"> </script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"> </script>
 
     <script type="text/javascript">
 
