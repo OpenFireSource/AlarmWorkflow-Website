@@ -1,0 +1,14 @@
+﻿AlarmWorkflow-Website v1. Release Notes
+============================================
+
+Änderungen seit v0.9.8.0
+------------------------
+
+Fehlerbehebungen
+  * Route wird bei neuem Einsatz gelöscht.
+
+Generelles
+  
+  * Verwendung von AngularJS.
+  * Wichtig: Ab einschließlich dieser Version unterstützt AlarmWorkflow nur Windows 7 SP1 und höher (.Net Framework 4.6)!
+  
